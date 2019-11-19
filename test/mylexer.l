@@ -1,62 +1,13 @@
 
 %{
-#include<math.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<iostream>
-#include<cstring>
-using namespace std;
-#define error -1
-class Node {
-public:
-	int value;
-	int address;
-	string name;
-	string type;
-	Node* next;
-	Node();
-};
-Node::Node(){
-	next = NULL;
-}
-class Table {
-public:
-	Node *first,*end;
-	Table();
-	void add(Node* node);
-	int check(string _name);
-};
-Table::Table(){
-	first=NULL;
-	end=NULL;
-}
-void Table::add(Node* node){
-	if(first == NULL) {
-		first = node;
-		end = node;
-		return;
-	}
-	end->next = node;
-	end = node;
-}
+#include "table.h"
+#include "myparser.tab.h"
 
-int Table::check(string _name) {
-	Node* p = first;
-	if (p == NULL) {
-		return -1;
-	}
-	while (p != NULL && p->name != _name){
-		p = p->next;
-	}
-	if (p == NULL) {
-		return -1;
-	}
-	return p->address;	
-}
+extern YYSTYPE yylval;
 Table my_table;
-int init_ID(string _name) {
+/*int init_ID(string _name) {
 	int addr = my_table.check(_name);
-	if (addr != -1) {
+	if (addr != error) {
 		return addr;
 	}
 	Node* new_node = new Node();
@@ -65,19 +16,30 @@ int init_ID(string _name) {
 	new_node->address = int(new_node);
 	my_table.add(new_node);
 	return new_node->address; 
+}*/
+Node* hello_ID(string _name) {
+	Node* addr = my_table.check(_name);
+	if (addr != NULL) {
+		return addr;
+	}
+	Node* new_node = new Node();
+	new_node->name = _name;
+	new_node->address = int(new_node);
+	my_table.add(new_node);
+	return new_node;
 }
-
 
 %}
 
 DIGIT [0-9]+
-ID [_]*[A-Za-z][_]*[A-Za-z0-9_]*
+ID [A-Za-z_][A-Za-z0-9_]*
 EOR_ID [0-9]+[_]*[A-Za-z0-9_]*
 ws [\t\n ]*
 VOID void
 INT int
 MAIN main
 IF if
+ELSE else
 LP   "("
 RP   ")"
 LBRACE    "{"
@@ -89,67 +51,247 @@ SEMICOLON   ;
 COMIC    ,
 STRUCT   struct
 INPUT    scanf
-OUTPUT   printf
+OUTPUT   print
 WHILE    while
 FOR    for
-ROP    "=="|">"|"<"|">="|"<="|"!="
-LOP    "&&"|"||"|"!"
+PLUS "+"
+MINUS "-"
+MULTIPLY "*"
+DIVIDE "/"
+MOD "%"
+POW "^"
+L_E "=="
+GT ">"
+GTandL_E ">="
+LT "<"
+LTandL_E "<="
+LNOT "!="
+AND "&&"
+OR "||"
+NOT "!"
 DEFINE    #define
-COMMENT    ("//"[ \t\nA-Za-z_0-9]*)|("/*"[A-Za-z_0-9\t\n ]*"*/")
-INPUT_FORMAT    "%d"|"%s"|"%f"
+COMMENT    ("//"[^\n]*)|("/*"[^\t\n ]*"*/")
+
 %%
-{DIGIT}                     {printf("%-20s%-20s%-20d\n","NUMBER",yytext,atoi(yytext));}
-{VOID}                      {printf("%-20s%-20s\n","VOID",yytext);}
-{INT}                       {printf("%-20s%-20s\n","INT",yytext);}
-{MAIN}                      {printf("%-20s%-20s\n","MAIN",yytext);}
-{WHILE}                     {printf("%-20s%-20s\n","WHILE",yytext);}
-{FOR}                       {printf("%-20s%-20s\n","FOR",yytext);}
-{IF}                        {printf("%-20s%-20s\n","IF",yytext);}
-{ASSIGN}                    {printf("%-20s%-20s\n","ASSIGN",yytext);}
-{SEMICOLON}                 {printf("%-20s%-20s\n","SEMICOLON",yytext);}
-{DEFINE}                    {printf("%-20s%-20s\n","DEFINE",yytext);}
-{STRUCT}                    {printf("%-20s%-20s\n","STRUCT",yytext);}
-{INPUT}                     {printf("%-20s%-20s\n","INPUT",yytext);}
-{OUTPUT}                    {printf("%-20s%-20s\n","OUTPUT",yytext);}
-{ID}                        {printf("%-20s%-20s%-20d\n","ID", yytext, init_ID(yytext));}						
-{EOR_ID}                    {printf("%-20s%-20s\n","EOR_ID",yytext);}
-"+"                         {printf("%-20s%-20s\n","PLUS(OP)",yytext);}
-"-"                         {printf("%-20s%-20s\n","MINUS(OP)",yytext);}
-"*"                         {printf("%-20s%-20s\n","MULTIPLY(OP)",yytext);}
-"/"                         {printf("%-20s%-20s\n","DIVIDE(OP)",yytext);}
-"%"                         {printf("%-20s%-20s\n","MOD(OP)",yytext);}
-"^"                         {printf("%-20s%-20s\n","POW(OP)",yytext);}
-"=="                        {printf("%-20s%-20s\n","L_E(LP)",yytext);}
-">"                         {printf("%-20s%-20s\n","GT(LP)",yytext);}
-"<"                         {printf("%-20s%-20s\n","LT(LP)",yytext);}
-">="                        {printf("%-20s%-20s\n","GT&L_E(LP)",yytext);}
-"<="                        {printf("%-20s%-20s\n","LT&L_E(LP)",yytext);}
-"!="                        {printf("%-20s%-20s\n","LNOT(LP)",yytext);}                        
-"&&"                        {printf("%-20s%-20s\n","AND(LOP)",yytext);}                    
-"||"                        {printf("%-20s%-20s\n","OR(LOP)",yytext);}
-"!"                         {printf("%-20s%-20s\n","NOT(LOP)",yytext);}
-{LP}                        {printf("%-20s%-20s\n","LP",yytext);}
-{RP}                        {printf("%-20s%-20s\n","RP",yytext);}
-{SINGLE_QUOTE}              {printf("%-20s%-20s\n","SINGLE_QUOTE",yytext);}
-{DOUBLE_QUOTE}              {printf("%-20s%-20s\n","DOUBLE_QUOTE",yytext);}
-{LBRACE}                    {printf("%-20s%-20s\n","LBRACE",yytext);}
-{RBRACE}                    {printf("%-20s%-20s\n","RBRACE",yytext);}
-{COMMENT}                   {printf("%-20s%-20s\n","COMMENT",yytext);}
-{COMIC}                     {printf("%-20s%-20s\n","COMIC",yytext);}
-{INPUT_FORMAT}              {printf("%-20s%-20s\n","INPUT_FORMAT",yytext);}
+
+{DIGIT}                     {
+								//printf("%-20s%-20s%-20d\n","NUMBER",yytext,atoi(yytext));
+								yylval.node = new Node(atoi(yytext));
+								return(DIGIT);
+							}
+
+{VOID}                      {
+								//printf("%-20s%-20s\n","VOID",yytext);
+							
+								return(VOID);
+							}
+
+{INT}                       {	
+								//printf("%-20s%-20s\n","INT",yytext);
+								
+								return(INT);
+							}
+
+{MAIN}                      {
+								//printf("%-20s%-20s\n","MAIN",yytext);
+								
+								return(MAIN);
+							}
+
+{WHILE}                     {
+								//printf("%-20s%-20s\n","WHILE",yytext);
+								
+								return(WHILE);
+							}
+
+{FOR}                       {
+								//printf("%-20s%-20s\n","FOR",yytext);
+							
+								return(FOR);
+							}
+
+{IF}                        {
+								//printf("%-20s%-20s\n","IF",yytext);
+								
+								return(IF);
+							}
+		
+{ELSE}                      {
+								//printf("%-20s%-20s\n","ELSE",yytext);
+								
+								return(ELSE);
+							}
+
+{ASSIGN}                    {
+								//printf("%-20s%-20s\n","ASSIGN",yytext);
+								
+								return(ASSIGN);
+							}
+
+{SEMICOLON}                 {
+								//printf("%-20s%-20s\n","SEMICOLON",yytext);
+								return(SEMICOLON);
+							}
+
+{DEFINE}                    {
+								//printf("%-20s%-20s\n","DEFINE",yytext);
+								return(DEFINE);
+							}
+
+{STRUCT}                    {
+								//printf("%-20s%-20s\n","STRUCT",yytext);
+								return(STRUCT);
+							}
+
+{INPUT}                     {	
+								//printf("%-20s%-20s\n","INPUT",yytext);
+								return(INPUT);
+							}
+
+{OUTPUT}                    {	
+								//printf("%-20s%-20s\n","OUTPUT",yytext);
+								
+								return(OUTPUT);
+							}
+
+{ID}                        {
+								yylval.node = hello_ID(yytext);
+								//printf("%-20s%-20s%-20d\n","ID", yytext, init_ID(yytext));
+								
+								return(ID);	
+							}	
+
+{EOR_ID}                    {	
+								//printf("%-20s%-20s\n","EOR_ID",yytext);
+								
+								return(EOR_ID);
+							}
+
+{PLUS}                      {	
+								//printf("%-20s%-20s\n","PLUS",yytext);
+								
+								return(PLUS);
+							}
+
+{MINUS}                     {	
+								//printf("%-20s%-20s\n","MINUS",yytext);
+								
+								return(MINUS);
+							}
+
+{MULTIPLY}                  {
+								//printf("%-20s%-20s\n","MULTIPLY",yytext);
+								
+								return(MULTIPLY);
+							}
+
+{DIVIDE}                    {
+								//printf("%-20s%-20s\n","DIVIDE",yytext);
+								
+								return(DIVIDE);
+							}
+
+{MOD}                       {	
+								//printf("%-20s%-20s\n","MOD",yytext);
+								
+								return(MOD);
+							}
+
+{POW}                       {
+								//printf("%-20s%-20s\n","POW",yytext);
+								
+								return(POW);
+							}
+
+{L_E}                       {
+								//printf("%-20s%-20s\n","L_E",yytext);
+								
+								return(L_E);
+							}
+
+{GT}                        {
+								//printf("%-20s%-20s\n","GT",yytext);
+								
+								return(GT);
+							}
+
+{LT}                        {	
+								//printf("%-20s%-20s\n","LT",yytext);
+								
+								return(LT);
+							}
+
+{GTandL_E}                  {	
+								//printf("%-20s%-20s\n","GTandL_E",yytext);
+								
+								return(GTandL_E);
+							}
+
+{LTandL_E}                  {	
+								//printf("%-20s%-20s\n","LTandL_E",yytext);
+								
+								return(LTandL_E);
+							}
+
+{LNOT}                      {	
+								//printf("%-20s%-20s\n","LNOT",yytext);
+								
+								return(LNOT);
+							}   
+
+{AND}                       {	
+								//printf("%-20s%-20s\n","AND",yytext);
+								
+								return(AND);
+							}  
+
+{OR}                        {	
+								//printf("%-20s%-20s\n","OR",yytext);
+								
+								return(OR);
+							}
+
+{NOT}                       {	
+								//printf("%-20s%-20s\n","NOT",yytext);
+								
+								return(NOT);
+							}
+
+{LP}                        {
+								//printf("%-20s%-20s\n","LP",yytext);
+								return(LP);
+							}
+
+{RP}                        {	
+								//printf("%-20s%-20s\n","RP",yytext);
+								return(RP);
+							}
+
+{SINGLE_QUOTE}              {	
+								//printf("%-20s%-20s\n","SINGLE_QUOTE",yytext);
+								return(SINGLE_QUOTE);
+							}
+
+{DOUBLE_QUOTE}              {	
+								//printf("%-20s%-20s\n","DOUBLE_QUOTE",yytext);
+								return(DOUBLE_QUOTE);
+							}
+{LBRACE}                    {//printf("%-20s%-20s\n","LBRACE",yytext);
+							return(LBRACE);}
+{RBRACE}                    {//printf("%-20s%-20s\n","RBRACE",yytext);
+							return(RBRACE);}
+{COMMENT}                   {//printf("%-20s%-20s\n","COMMENT",yytext);
+							}
+{COMIC}                     {//printf("%-20s%-20s\n","COMIC",yytext);
+								return(COMIC);}
 {ws}                        {}
-.                           {printf("%-20s%-20s\n","UNDEFINED",yytext);}
+.                           {//printf("%-20s%-20s\n","UNDEFINED",yytext);
+							return(UNDEFINED);}
 
 %%
 
-int main()
+
+int yywrap(void)
 {
-	//yyin = fopen("2.c","r");
-    yylex();
-	getchar();
-    return 0;
-}
-int yywrap()
-{
-    return 1;
+	return 1;
 }

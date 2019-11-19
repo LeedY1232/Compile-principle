@@ -1,0 +1,46 @@
+typedef union {
+		class Node *node;
+		class Tnode *tnode;
+} YYSTYPE;
+#define	VOID	257
+#define	INT	258
+#define	MAIN	259
+#define	WHILE	260
+#define	FOR	261
+#define	IF	262
+#define	ELSE	263
+#define	SEMICOLON	264
+#define	ASSIGN	265
+#define	DEFINE	266
+#define	STRUCT	267
+#define	INPUT	268
+#define	OUTPUT	269
+#define	ID	270
+#define	DIGIT	271
+#define	EOR_ID	272
+#define	PLUS	273
+#define	MINUS	274
+#define	MULTIPLY	275
+#define	DIVIDE	276
+#define	MOD	277
+#define	POW	278
+#define	L_E	279
+#define	GT	280
+#define	LT	281
+#define	GTandL_E	282
+#define	LTandL_E	283
+#define	LNOT	284
+#define	NOT	285
+#define	AND	286
+#define	OR	287
+#define	LP	288
+#define	RP	289
+#define	SINGLE_QUOTE	290
+#define	DOUBLE_QUOTE	291
+#define	LBRACE	292
+#define	RBRACE	293
+#define	COMIC	294
+#define	UNDEFINED	295
+
+
+extern YYSTYPE yylval;

@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <vector>
 #include <iostream>
 using namespace std;
 #include <cstring>
@@ -18,7 +18,10 @@ public:
 	Node *next;
 	Node()
 	{
-		next = NULL;
+		this->next = NULL;
+	}
+	Node(int number){
+		this->value = number;
 	}
 	
 };
@@ -43,12 +46,12 @@ public:
 		end->next = node;
 		end = node;
 	}
-	int check(string _name)
+	Node* check(string _name)
 	{
 		Node *p = first;
 		if (p == NULL)
 		{
-			return error;
+			return NULL;
 		}
 		while (p != NULL && p->name != _name)
 		{
@@ -56,26 +59,32 @@ public:
 		}
 		if (p == NULL)
 		{
-			return error;
+			return NULL;
 		}
-		return p->address;
+		return p;
 	}
 };
 
 class Tnode{
+public:
 	string type;
 	string name;
 	string childrenmsg;
 	int childnum;
 	Node *address;
-	vector<Tnode> child;
+	vector<Tnode*> child;
 	Tnode(string msg, string name)
 	{
 		this->type = msg;
 		this->name = name;
 		this->childrenmsg = "children:";
-		next = NULL;
+		this->address = NULL;
 	};
+	void addchild(Tnode *t){
+		if(t != NULL){
+			child.push_back(t);
+		}
+	}
 	
 };
 
@@ -83,23 +92,23 @@ class Tnode{
 class Parse_Tree
 {
 public:
-	Node *root;
-	Node *childtree_root;
+	Tnode *root;
 	char treemsg[2048];
 	Parse_Tree()
 	{
-		root = NULL;
-		childtree_root = NULL;
+		this->root = NULL;
 	}
-	void initNewnode(Node *child, ...)
-	{
-		va_list childlist;
-		va_start(childlist, *child);
-		va_arg(childlist, Node);
-		va_end(childlist);
-	}
-
-	void print_tree(){
-
+	void print_tree(Tnode* c, int num){
+		cout<<c->type<<"    "<<c->name<<endl;
+		for(int i = 0; i < c->child.size(); i++) {
+			for(int j = 0; j < num; j++) {
+				cout<<"  ";
+				if(j == num-1){
+					cout<<"|-*";
+				}
+			}
+			print_tree((c->child)[i], num + 1);
+		}
+		
 	}
 };
